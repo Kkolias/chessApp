@@ -440,6 +440,7 @@
 <script lang="ts">
 import { ChessPieceItem } from '../interfaces/chess'
 import computedFile from './ChessBoard.vue.computed'
+import service from './ChessBoard.service'
 export default {
   props: {
     positionWhites: { type: Object, default: () => null },
@@ -458,39 +459,65 @@ export default {
     findPieceFoorCoordinate(coordinate: string): ChessPieceItem {
       const pieceBlack: any =
         Object.values(this.positionBlacks)?.find(
-          (piece: ChessPieceItem) => piece.position === coordinate && !piece.dead
+          (piece: ChessPieceItem) =>
+            piece.position === coordinate && !piece.dead
         ) || null
-      console.log('PIECE: ', pieceBlack)
       if (pieceBlack) return pieceBlack
       const pieceWhite: any =
         Object.values(this.positionWhites)?.find(
-          (piece: ChessPieceItem) => piece.position === coordinate && !piece.dead
+          (piece: ChessPieceItem) =>
+            piece.position === coordinate && !piece.dead
         ) || null
       return pieceWhite
     },
+    isSelectedPiece(piece: ChessPieceItem):boolean {
+        if(!this.selectedPiece) return false
+        return piece.id === this.selectedPiece?.id
+    },
     columnStyle(coordinate: string) {
       const piece = this.findPieceFoorCoordinate(coordinate)
-      if (!piece ) return null
+      if (!piece) return null
+      if(this.isSelectedPiece(piece)) {
+        return {
+        backgroundImage: `url(${piece.icon})`,
+        backgroundColor: '#a3744e'
+      }
+      }
       return {
         backgroundImage: `url(${piece.icon})`,
       }
     },
 
     handleClick(coordinate: string): void {
-      console.log(coordinate)
       const { selectedPiece } = this
       const pieceOfCoordinate = this.findPieceFoorCoordinate(coordinate)
-      if (!pieceOfCoordinate && this.selectedPiece) {
-        this.$emit('movePiece', {
-          position: coordinate,
-          id: selectedPiece.id,
-          side: selectedPiece.side,
-        })
-        this.setSelectedPiece(null)
+      if(!selectedPiece && !pieceOfCoordinate) {
+        return
       }
-      if (!this.selectedPiece && pieceOfCoordinate) {
+      if (!selectedPiece && pieceOfCoordinate) {
         this.setSelectedPiece(pieceOfCoordinate)
+        return
       }
+      if(service.coordinateHasOwnPiece(pieceOfCoordinate, selectedPiece)) {
+        this.setSelectedPiece(pieceOfCoordinate)
+        return
+      }
+
+      const { movedPiece, eatenPiece, didMove } = service.handleMove(
+        coordinate,
+        selectedPiece,
+        this.positionWhites,
+        this.positionBlacks
+      )
+      if (!didMove) return
+
+      this.$emit('movePiece', {
+        position: movedPiece.position,
+        id: movedPiece.id,
+        side: movedPiece.side,
+      })
+
+      this.setSelectedPiece(null)
     },
     setSelectedPiece(piece: ChessPieceItem | null): void {
       this.selectedPiece = piece

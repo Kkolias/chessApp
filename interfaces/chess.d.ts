@@ -5,6 +5,7 @@ export interface ChessPieceItem {
   dead: boolean
   position: string
   icon: string
+  hasMoved?: boolean
 }
 
 export interface ChessPiecesBlack {
@@ -28,8 +29,20 @@ export interface ChessPiecesBlack {
 
 export interface ChessPiecesWhite {
     pawn1_w: ChessPieceItem
+    pawn2_w: ChessPieceItem
+    pawn3_w: ChessPieceItem
+    pawn4_w: ChessPieceItem
+    pawn5_w: ChessPieceItem
+    pawn6_w: ChessPieceItem
+    pawn7_w: ChessPieceItem
+    pawn8_w: ChessPieceItem
+    rook1_w: ChessPieceItem
+    rook2_w: ChessPieceItem
+    knight1_w: ChessPieceItem
+    knight2_w: ChessPieceItem
+    bishop1_w: ChessPieceItem
+    bishop2_w: ChessPieceItem
+    king_w: ChessPieceItem
+    queen_w: ChessPieceItem
 }
 
-declare class Testi {
-    pawn1_b: ChessPieceItem
-}
