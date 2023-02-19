@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+    <Chess />
+  </div>
 </template>
 
 <script lang="ts">
